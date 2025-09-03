@@ -7,26 +7,27 @@ format: html
 ---
 ## EPI 590R Final Project
 
-## Central Park Squirrels Analysis
-
-**Installation of packages**
-This step installs packages that are not already installed on your computer neccessary for the following code to work. 
 ```{r}
 #| messages: false
 #| echo: false
 #| warning: false
 #| results: hide
+
+# **Installation of packages**
+# This step installs packages that are not already installed on your computer neccessary for the following code to work. 
+
 packages_to_install <- c("tidytuesdayR", "gtsummary", "tidyverse", "here", "readr")
 #install.packages(packages_to_install)
 lapply(packages_to_install, require, character.only=TRUE)
 ```
 
-## Reading in the dataset
 ```{r here} 
 #| message: false
 #| echo: false
 #| warning: false
 #| results: hide
+
+# Reading in the dataset
 here::here()
 # my project directory is "/Users/swhiteside/Final Project EPI590R"
 getwd()
