@@ -52,7 +52,6 @@ This step is neccessary as some of the missing values for Age were coded as NA a
 #| tbl-cap: "Table 1. Descriptive Statistics" 
 #| message: false
 #| warning: false
-#| results: hide
 
 descriptive_table <- tbl_summary(
 	squirrel_data,
@@ -68,6 +67,16 @@ descriptive_table <- tbl_summary(
     modify_caption(caption = "Table 1. Descriptive Statistics")
 descriptive_table 
 
+# Using here to save table as a csv 
+descriptive_table_df <- as.data.frame(descriptive_table)
+write_csv(descriptive_table_df, here("descriptive_table.csv"))
+```
+
+``` {r hide-inline-descrp}
+#| messages: false
+#| echo: false
+#| warning: false
+#| results: hide
 
 inline_text(descriptive_table, variable="Age", column = "Black", level = "Juvenile") #8 (8%)
 inline_text(descriptive_table, variable="Age", column = "Gray", level = "Juvenile") #256 (11%)
@@ -75,12 +84,7 @@ inline_text(descriptive_table, variable="Age", column = "Cinnamon", level = "Juv
 inline_text(descriptive_table, variable="Age", column = "Black", level = "Adult") #92 (92%)
 inline_text(descriptive_table, variable="Age", column = "Gray", level = "Adult") #2125 (89%)
 inline_text(descriptive_table, variable="Age", column = "Cinnamon", level = "Adult") #326 (85%)
-
-# Using here to save table as a csv 
-descriptive_table_df <- as.data.frame(descriptive_table)
-write_csv(descriptive_table_df, here("descriptive_table.csv"))
 ```
-
 
 @tbl-descriptive describes the distribution of certain characteristics of the squirrels in Central Park. One of these characteristics is Age, which is displayed by primary fur color.  
 
@@ -100,8 +104,7 @@ Lastly, there were `r inline_text(descriptive_table, variable = "Age", column = 
 # Recode binary predictors
 binary_func <- function(data, cols) {
   data[cols] <- lapply(data[cols], function(x) ifelse(x, 1, 0))
-  data
-}
+  data}
 squirrel_data <- binary_func(squirrel_data, c("Tail flags", "Tail twitches"))
 
 # Recode outcome as factor
@@ -126,7 +129,17 @@ table2 <- tbl_uvregression(
 table2
 ```
 
-@tbl-regression is a binomial logistic regression with squirrel age as the outcome and tail flags and tail twitches as predictors.
+```{r hide-inline-reg}
+#| messages: false
+#| echo: false
+#| warning: false
+#| results: hide
+
+inline_text(table2, variable = "Tail flags") # OR
+inline_text(table2, variable = "Tail twitches")
+```
+
+@tbl-regression is a binomial logistic regression with squirrel age as the outcome and tail flags and tail twitches as predictors. For each tail flag that occurs, the odds of being an adult squirrel is 13% lower than the odds of being a juvenile (`r inline_text(table2, variable = "Tail flags")`, not statistically significant). For each tail twitch that occurs, the odds of being an adult squirrel is 20% lower than the odds of being a juvenile (`r inline_text(table2, variable = "Tail twitches")`, not statistically significant).
 
 
 ## **Figure**
