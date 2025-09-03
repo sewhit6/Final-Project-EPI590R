@@ -71,6 +71,10 @@ inline_text(descriptive_table, variable="Age", column = "Cinnamon", level = "Juv
 inline_text(descriptive_table, variable="Age", column = "Black", level = "Adult") #92 (92%)
 inline_text(descriptive_table, variable="Age", column = "Gray", level = "Adult") #2125 (89%)
 inline_text(descriptive_table, variable="Age", column = "Cinnamon", level = "Adult") #326 (85%)
+
+# Using here to save table as a csv 
+descriptive_table_df <- as.data.frame(descriptive_table)
+write_csv(descriptive_table_df, here("descriptive_table.csv"))
 ```
 
 
