@@ -86,6 +86,7 @@ Lastly, there were `r inline_text(descriptive_table, variable = "Age", column = 
 ```{r} 
 #| label: regression-table
 #| tbl-cap: "Table 2. Binomial Logistic Regression" 
+#| message: false
 
 # Recode binary (TRUE/FALSE) predictors with a function
 binary_func <- function(data, cols) {
@@ -116,3 +117,25 @@ table2
 ```
 
 @regression-table is a binomial logistic regression that has age as the predictor and tail flags and tail twitches as outcomes.
+
+## **Figure**
+```{r}
+#| label: fig-barplot
+#| fig-cap: "Barplot of Primary Fur Color"
+#| message: false
+
+# Creating figure
+barplot(table(squirrel_data$`Primary Fur Color`),
+        col = c("black", "firebrick", "gray"),
+        main = "Distribution of Primary Fur Color",
+        ylab = "Count",
+        xlab = "Primary Fur Color")
+
+# Calculating how many squirrels in each primary fur color
+table(squirrel_data$`Primary Fur Color`)["Black"]
+table(squirrel_data$`Primary Fur Color`)["Cinnamon"]
+table(squirrel_data$`Primary Fur Color`)["Gray"]
+```
+
+@fig-barplot contains a barplot of primary fur color by squirrels spotted inside Central Park. There were `r table(squirrel_data[["Primary Fur Color"]])["Black"]` squirrels with Black as the primary fur color, `r table(squirrel_data[["Primary Fur Color"]])["Cinnamon"]` squirrels with Cinnamon as the primary color, and `r table(squirrel_data[["Primary Fur Color"]])["Gray"]` squirrels with Gray as the primary color.
+
