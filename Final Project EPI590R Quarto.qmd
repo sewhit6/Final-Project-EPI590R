@@ -1,7 +1,7 @@
 ---
 title: "EPI590R Final Project"
 author: "Sarah Whiteside"
-execute: 
+execute:
   echo: false
 format: html
 ---
@@ -14,6 +14,7 @@ This step installs packages that are not already installed on your computer necc
 ```{r}
 #| messages: false
 #| echo: false
+#| warning: false
 #| results: hide
 packages_to_install <- c("tidytuesdayR", "gtsummary", "tidyverse", "here", "readr")
 #install.packages(packages_to_install)
@@ -24,6 +25,7 @@ lapply(packages_to_install, require, character.only=TRUE)
 ```{r here} 
 #| message: false
 #| echo: false
+#| warning: false
 #| results: hide
 here::here()
 # my project directory is "/Users/swhiteside/Final Project EPI590R"
@@ -46,9 +48,11 @@ This step is neccessary as some of the missing values for Age were coded as NA a
 
 **Table 1. Descriptive Statistic**
 ```{r}
-#| label: descriptive-table
+#| label: tbl-descriptive
 #| tbl-cap: "Table 1. Descriptive Statistics" 
 #| message: false
+#| warning: false
+#| results: hide
 
 descriptive_table <- tbl_summary(
 	squirrel_data,
@@ -78,7 +82,7 @@ write_csv(descriptive_table_df, here("descriptive_table.csv"))
 ```
 
 
-@descriptive-table describes the distribution of certain characteristics of the squirrels in Central Park. One of these characteristics is Age, which is displayed by primary fur color.  
+@tbl-descriptive describes the distribution of certain characteristics of the squirrels in Central Park. One of these characteristics is Age, which is displayed by primary fur color.  
 
 For the juvenile age category, there were `r inline_text(descriptive_table, variable = "Age", column = "Black", level = "Juvenile")` Black juvenile squirrels and `r inline_text(descriptive_table, variable = "Age", column = "Black", level = "Adult")` adult Black squirrels.  
 
@@ -88,19 +92,19 @@ Lastly, there were `r inline_text(descriptive_table, variable = "Age", column = 
 
 **Table 2. Regression Table**
 ```{r} 
-#| label: regression-table
-#| tbl-cap: "Table 2. Binomial Logistic Regression" 
+#| label: tbl-regression
+#| tbl-cap: "Table 2. Binomial Logistic Regression"
 #| message: false
+#| warning: false
 
-# Recode binary (TRUE/FALSE) predictors with a function
+# Recode binary predictors
 binary_func <- function(data, cols) {
-  squirrel_data[cols] <- lapply(squirrel_data[cols], function(x) ifelse(x, 1, 0))
-  squirrel_data}
+  data[cols] <- lapply(data[cols], function(x) ifelse(x, 1, 0))
+  data
+}
+squirrel_data <- binary_func(squirrel_data, c("Tail flags", "Tail twitches"))
 
-# Using the binary function
-squirrel_data <- squirrel_data |> binary_func(c("Tail flags", "Tail twitches"))
-
-# Recode outcome as factor (Adult = 1, Juvenile = 0)
+# Recode outcome as factor
 squirrel_data$Age <- factor(
   ifelse(squirrel_data$Age == "Adult", 1,
   ifelse(squirrel_data$Age == "Juvenile", 0, NA)),
@@ -111,22 +115,26 @@ squirrel_data$Age <- factor(
 table2 <- tbl_uvregression(
   data = squirrel_data,
   y = Age,
-  include = c("Tail flags", "Tail twitches"),
+  include = c(`Tail flags`, `Tail twitches`),
   method = glm,
   method.args = list(family = binomial()),
-  exponentiate = TRUE) |> 
-	modify_header(label ~ "**Predictors**") |>
-	modify_caption("**Table 2. Binomial Logistic Regression - Tail Flags and Twitches as Predictors of Squirrel Age**")
+  exponentiate = TRUE
+) |> 
+  modify_header(label ~ "**Predictors**") |>
+  modify_caption("**Table 2. Binomial Logistic Regression - Tail Flags and Twitches as Predictors of Squirrel Age**")
+
 table2
 ```
 
-@regression-table is a binomial logistic regression that has age as the predictor and tail flags and tail twitches as outcomes.
+@tbl-regression is a binomial logistic regression with squirrel age as the outcome and tail flags and tail twitches as predictors.
+
 
 ## **Figure**
 ```{r}
 #| label: fig-barplot
 #| fig-cap: "Barplot of Primary Fur Color"
 #| message: false
+#| results: hide
 
 # Creating figure
 barplot(table(squirrel_data$`Primary Fur Color`),
