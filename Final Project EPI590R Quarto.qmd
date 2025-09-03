@@ -1,0 +1,73 @@
+---
+title: "EPI590R Final Project"
+author: "Sarah Whiteside"
+execute: 
+  echo: false
+format: html
+---
+## EPI 590R Final Project
+
+## Central Park Squirrels Analysis
+
+**Installation of packages**
+This step installs packages that are not already installed on your computer neccessary for the following code to work. 
+```{r}
+#| messages: false
+#| echo: false
+#| results: hide
+packages_to_install <- c("tidytuesdayR", "gtsummary", "tidyverse", "here", "readr")
+#install.packages(packages_to_install)
+lapply(packages_to_install, require, character.only=TRUE)
+```
+
+## Reading in the dataset
+```{r here} 
+#| message: false
+#| echo: false
+#| results: hide
+here::here()
+# my project directory is "/Users/swhiteside/Final Project EPI590R"
+getwd()
+# my working directory is "/Users/swhiteside/Final Project EPI590R"
+squirrel_data <- read_csv(here("squirrel_data.csv"))
+```
+
+# *Central Park Squirrel Census*
+
+## Squirrel data! The data this week comes from the 2018 Central Park Squirrel Census.
+
+**Data Descriptions:** The Squirrel Census is a multimedia science, design, and storytelling project focusing on the Eastern gray (Sciurus carolinensis). They count squirrels and present their findings to the public. The dataset contains squirrel data for each of the 3,023 sightings, including location coordinates, age, primary and secondary fur color, elevation, activities, communications, and interactions between squirrels and with humans.
+
+**Cleaning the dataset**
+```{r cleaning}
+squirrel_data$Age[squirrel_data$Age == "?"] <- NA
+```
+This step is neccessary as some of the missing values for Age were coded as NA and others as question marsk (?). This homogenizes the missing values as NA. 
+
+**Table 1. Descriptive Statistic**
+```{r}
+#| label: descriptive-table
+#| tbl-cap: "Table 1. Descriptive Statistics" 
+
+descriptive_table <- tbl_summary(
+	squirrel_data,
+	by = "Primary Fur Color",
+	include = c("Age", "Shift", "Running", "Chasing", "Climbing", "Foraging"),
+	missing_text = "Missing") |> 
+		add_p(test = list (all_continuous() ~ "t.test",
+											 all_categorical() ~ "chisq.test")) |> 
+		add_overall(last=TRUE) |> 
+		bold_labels() |> 
+		modify_footnote(update = everything() ~ NA) |> 
+		modify_header(label = "**Variable**", p.value = "**P**") |> 
+    modify_caption(caption = "Table 1. Descriptive Statistics")
+descriptive_table 
+
+
+inline_text(descriptive_table, variable="Age", column = "Black", level = "Juvenile") #8 (8%)
+inline_text(descriptive_table, variable="Age", column = "Gray", level = "Juvenile") #256 (11%)
+inline_text(descriptive_table, variable="Age", column = "Cinnamon", level = "Juvenile") # 58 (15%)
+inline_text(descriptive_table, variable="Age", column = "Black", level = "Adult") #92 (92%)
+inline_text(descriptive_table, variable="Age", column = "Gray", level = "Adult") #2125 (89%)
+inline_text(descriptive_table, variable="Age", column = "Cinnamon", level = "Adult") #326 (85%)
+```
