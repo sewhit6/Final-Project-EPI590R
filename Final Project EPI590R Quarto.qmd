@@ -48,6 +48,7 @@ This step is neccessary as some of the missing values for Age were coded as NA a
 ```{r}
 #| label: descriptive-table
 #| tbl-cap: "Table 1. Descriptive Statistics" 
+#| message: false
 
 descriptive_table <- tbl_summary(
 	squirrel_data,
@@ -71,3 +72,47 @@ inline_text(descriptive_table, variable="Age", column = "Black", level = "Adult"
 inline_text(descriptive_table, variable="Age", column = "Gray", level = "Adult") #2125 (89%)
 inline_text(descriptive_table, variable="Age", column = "Cinnamon", level = "Adult") #326 (85%)
 ```
+
+
+@descriptive-table describes the distribution of certain characteristics of the squirrels in Central Park. One of these characteristics is Age, which is displayed by primary fur color.  
+
+For the juvenile age category, there were `r inline_text(descriptive_table, variable = "Age", column = "Black", level = "Juvenile")` Black juvenile squirrels and `r inline_text(descriptive_table, variable = "Age", column = "Black", level = "Adult")` adult Black squirrels.  
+
+There were `r inline_text(descriptive_table, variable = "Age", column = "Gray", level = "Juvenile")` juvenile Gray squirrels and `r inline_text(descriptive_table, variable = "Age", column = "Gray", level = "Adult")` adult Gray squirrels.  
+
+Lastly, there were `r inline_text(descriptive_table, variable = "Age", column = "Cinnamon", level = "Juvenile")` juvenile Cinnamon squirrels and `r inline_text(descriptive_table, variable = "Age", column = "Cinnamon", level = "Adult")` adult Cinnamon squirrels.
+
+**Table 2. Regression Table**
+```{r} 
+#| label: regression-table
+#| tbl-cap: "Table 2. Binomial Logistic Regression" 
+
+# Recode binary (TRUE/FALSE) predictors with a function
+binary_func <- function(data, cols) {
+  squirrel_data[cols] <- lapply(squirrel_data[cols], function(x) ifelse(x, 1, 0))
+  squirrel_data}
+
+# Using the binary function
+squirrel_data <- squirrel_data |> binary_func(c("Tail flags", "Tail twitches"))
+
+# Recode outcome as factor (Adult = 1, Juvenile = 0)
+squirrel_data$Age <- factor(
+  ifelse(squirrel_data$Age == "Adult", 1,
+  ifelse(squirrel_data$Age == "Juvenile", 0, NA)),
+  levels = c(0, 1),
+  labels = c("Juvenile", "Adult"))
+
+# Run regression
+table2 <- tbl_uvregression(
+  data = squirrel_data,
+  y = Age,
+  include = c("Tail flags", "Tail twitches"),
+  method = glm,
+  method.args = list(family = binomial()),
+  exponentiate = TRUE) |> 
+	modify_header(label ~ "**Predictors**") |>
+	modify_caption("**Table 2. Binomial Logistic Regression - Tail Flags and Twitches as Predictors of Squirrel Age**")
+table2
+```
+
+@regression-table is a binomial logistic regression that has age as the predictor and tail flags and tail twitches as outcomes.
